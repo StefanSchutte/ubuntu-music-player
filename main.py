@@ -51,6 +51,22 @@ class MusicPlayerWindow(Gtk.Window):
 
         self.set_titlebar(header)
 
+        # Create stack to hold different views
+        self.stack = Gtk.Stack()
+        self.stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+        self.stack.set_transition_duration(200)
+
+        # Create welcome screen
+        self.welcome_screen = self.create_welcome_screen()
+        self.stack.add_named(self.welcome_screen, "welcome")
+
+        # Create player view container
+        self.player_view = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.stack.add_named(self.player_view, "player")
+
+        # Add stack to main box
+        self.main_box.pack_start(self.stack, True, True, 0)
+
         # Create UI sections
         self.create_now_playing_section()
         self.create_playlist_view()
@@ -62,6 +78,15 @@ class MusicPlayerWindow(Gtk.Window):
 
         self.shuffle_enabled = False
         self.repeat_enabled = False
+
+        self.stack.set_visible_child_name("welcome")
+
+    def update_view(self):
+        """Switch between welcome screen and player view based on playlist content"""
+        if len(self.playlist_store) > 0:
+            self.stack.set_visible_child_name("player")
+        else:
+            self.stack.set_visible_child_name("welcome")
 
     def create_now_playing_section(self):
         # Create frame for now playing section
@@ -146,7 +171,7 @@ class MusicPlayerWindow(Gtk.Window):
         now_playing_box.pack_start(info_box, True, True, 0)
 
         frame.add(now_playing_box)
-        self.main_box.pack_start(frame, False, False, 0)
+        self.player_view.pack_start(frame, False, False, 0)
 
     def create_playlist_view(self):
         scrolled = Gtk.ScrolledWindow()
@@ -208,7 +233,47 @@ class MusicPlayerWindow(Gtk.Window):
         self.playlist_view.append_column(column_remove)
 
         scrolled.add(self.playlist_view)
-        self.main_box.pack_start(scrolled, True, True, 0)
+        self.player_view.pack_start(scrolled, True, True, 0)
+
+    def create_welcome_screen(self):
+        # Create main container for welcome screen
+        welcome_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        welcome_box.set_valign(Gtk.Align.CENTER)
+        welcome_box.set_halign(Gtk.Align.CENTER)
+
+        # Welcome message
+        welcome_label = Gtk.Label()
+        welcome_label.set_markup("<span size='large'>Select your audio file or folder to start listening</span>")
+        welcome_label.set_margin_bottom(20)
+        welcome_box.pack_start(welcome_label, False, False, 0)
+
+        # Buttons container
+        buttons_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        buttons_box.set_halign(Gtk.Align.CENTER)
+
+        # Open File button
+        open_file_button = Gtk.Button.new_from_icon_name("document-open", Gtk.IconSize.LARGE_TOOLBAR)
+        open_file_button.set_tooltip_text("Open File")
+        open_file_button.connect("clicked", self.on_file_clicked)
+
+        # Open Folder button
+        open_folder_button = Gtk.Button.new_from_icon_name("folder-open", Gtk.IconSize.LARGE_TOOLBAR)
+        open_folder_button.set_tooltip_text("Open Folder")
+        open_folder_button.connect("clicked", self.on_folder_clicked)
+
+        # Load Playlist button
+        load_playlist_button = Gtk.Button.new_from_icon_name("view-list", Gtk.IconSize.LARGE_TOOLBAR)
+        load_playlist_button.set_tooltip_text("Load Playlist")
+        load_playlist_button.connect("clicked", self.on_load_playlist_clicked)
+
+        # Add buttons to container
+        buttons_box.pack_start(open_file_button, False, False, 0)
+        buttons_box.pack_start(open_folder_button, False, False, 0)
+        buttons_box.pack_start(load_playlist_button, False, False, 0)
+
+        welcome_box.pack_start(buttons_box, False, False, 0)
+
+        return welcome_box
 
     def create_control_buttons(self):
         # Create outer box for centering
@@ -319,7 +384,7 @@ class MusicPlayerWindow(Gtk.Window):
         outer_box.pack_start(playlist_box, False, False, 0)
         outer_box.pack_start(control_box, True, True, 0)
 
-        self.main_box.pack_start(outer_box, False, False, 0)
+        self.player_view.pack_start(outer_box, False, False, 0)
 
     def on_shuffle_toggled(self, button):
         self.shuffle_enabled = button.get_active()
@@ -424,6 +489,7 @@ class MusicPlayerWindow(Gtk.Window):
             if os.path.isfile(file_path):
                 filename, title, artist, album, year, duration, artwork = self.get_metadata(file_path)
                 self.playlist_store.append([file_path, filename, title, artist, album, year, duration])
+        self.update_view()
 
     def scan_directory(self, directory):
         for root, dirs, files in os.walk(directory):
@@ -434,6 +500,7 @@ class MusicPlayerWindow(Gtk.Window):
                         filename, title, artist, album, year, duration, artwork = self.get_metadata(file_path)
                         print(f"Found: {title} by {artist}")  # Debug print
                         self.playlist_store.append([file_path, filename, title, artist, album, year, duration])
+        self.update_view()
 
     def is_music_file(self, filename):
         music_extensions = {'.mp3', '.wav', '.flac', '.ogg', '.m4a', '.aac'}
@@ -526,6 +593,7 @@ class MusicPlayerWindow(Gtk.Window):
             elif path.get_indices()[0] < self.current_track_index:
                 self.current_track_index -= 1
             self.playlist_store.remove(iter)
+            self.update_view()
 
     def on_play(self, button):
         self.player.set_state(Gst.State.PLAYING)
@@ -912,11 +980,14 @@ class MusicPlayerWindow(Gtk.Window):
                 selection.select_path(path)
                 self.playlist_view.scroll_to_cell(path, None, True, 0.5, 0.5)
                 self.play_track_at_index(0)
+                self.update_view()
 
             return True
         except Exception as e:
             print(f"Error loading playlist: {e}")
             return False
+
+
 
     def on_message(self, bus, message):
         t = message.type
