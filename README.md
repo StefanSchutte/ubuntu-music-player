@@ -3,6 +3,14 @@
 ## Description
 Ubuntu Music Player is a simple and elegant music player built with GTK3. It provides a clean interface with essential music playback functionalities.
 
+## Quick Download
+
+Ready to start using Ubuntu Music Player? Get the latest version here:
+
+[📥 Download Ubuntu Music Player](https://drive.google.com/file/d/1rLM1722RCQL1XOGfx2pHIvoIR-w28XJu/view?usp=drive_link)
+
+*This download includes the complete application with installation scripts.*
+
 ## Features
 * **Multiple Format Support**: Play MP3, WAV, FLAC, and other audio formats
 * **Metadata Display**: Shows album art, track title, artist, and album info
