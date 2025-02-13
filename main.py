@@ -248,23 +248,26 @@ class MusicPlayerWindow(Gtk.Window):
         welcome_box.pack_start(welcome_label, False, False, 0)
 
         # Buttons container
-        buttons_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        buttons_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)  # Increased spacing between buttons
         buttons_box.set_halign(Gtk.Align.CENTER)
 
         # Open File button
-        open_file_button = Gtk.Button.new_from_icon_name("document-open", Gtk.IconSize.LARGE_TOOLBAR)
+        open_file_button = Gtk.Button.new_from_icon_name("document-open", Gtk.IconSize.DND)
         open_file_button.set_tooltip_text("Open File")
         open_file_button.connect("clicked", self.on_file_clicked)
+        open_file_button.set_size_request(64, 64)  # Make the button bigger
 
         # Open Folder button
-        open_folder_button = Gtk.Button.new_from_icon_name("folder-open", Gtk.IconSize.LARGE_TOOLBAR)
+        open_folder_button = Gtk.Button.new_from_icon_name("folder-open", Gtk.IconSize.DND)
         open_folder_button.set_tooltip_text("Open Folder")
         open_folder_button.connect("clicked", self.on_folder_clicked)
+        open_folder_button.set_size_request(64, 64)  # Make the button bigger
 
         # Load Playlist button
-        load_playlist_button = Gtk.Button.new_from_icon_name("view-list", Gtk.IconSize.LARGE_TOOLBAR)
+        load_playlist_button = Gtk.Button.new_from_icon_name("view-list", Gtk.IconSize.DND)
         load_playlist_button.set_tooltip_text("Load Playlist")
         load_playlist_button.connect("clicked", self.on_load_playlist_clicked)
+        load_playlist_button.set_size_request(64, 64)  # Make the button bigger
 
         # Add buttons to container
         buttons_box.pack_start(open_file_button, False, False, 0)
@@ -276,16 +279,15 @@ class MusicPlayerWindow(Gtk.Window):
         return welcome_box
 
     def create_control_buttons(self):
-        # Create outer box for centering
-        outer_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        # Create outer box for centering with specific spacing
+        outer_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         outer_box.set_margin_top(10)
         outer_box.set_margin_bottom(10)
 
-        # Create left box for playlist controls
+        # Create left box for playlist controls with fixed width
         playlist_box = Gtk.Box(spacing=6)
-        playlist_box.set_margin_start(10)  # Add margin from the left edge
-        playlist_box.set_margin_top(10)
-        playlist_box.set_margin_bottom(10)
+        playlist_box.set_margin_start(10)
+        playlist_box.set_size_request(100, -1)  # Set fixed width
 
         # Save playlist button
         save_playlist_button = Gtk.Button()
@@ -297,7 +299,7 @@ class MusicPlayerWindow(Gtk.Window):
 
         # Load playlist button
         load_playlist_button = Gtk.Button()
-        load_icon = Gtk.Image.new_from_icon_name("document-open", Gtk.IconSize.SMALL_TOOLBAR)
+        load_icon = Gtk.Image.new_from_icon_name("view-list", Gtk.IconSize.SMALL_TOOLBAR)
         load_playlist_button.add(load_icon)
         load_playlist_button.set_tooltip_text("Load Playlist")
         load_playlist_button.connect("clicked", self.on_load_playlist_clicked)
@@ -307,9 +309,10 @@ class MusicPlayerWindow(Gtk.Window):
         playlist_box.pack_start(save_playlist_button, False, False, 0)
         playlist_box.pack_start(load_playlist_button, False, False, 0)
 
-        # Create center box for controls
+        # Create center box for controls with fixed width
         control_box = Gtk.Box(spacing=6)
-        control_box.set_halign(Gtk.Align.CENTER)  # Center horizontally
+        control_box.set_halign(Gtk.Align.CENTER)
+        control_box.set_size_request(400, -1)  # Fixed width for control section
 
         # Shuffle button
         self.shuffle_button = Gtk.ToggleButton()
@@ -325,30 +328,30 @@ class MusicPlayerWindow(Gtk.Window):
         self.repeat_button.set_size_request(45, 45)
         self.repeat_button.connect("toggled", self.on_repeat_toggled)
 
-        # Create buttons with handlers - using a more moderate size
+        # Previous button
         self.prev_button = Gtk.Button.new_from_icon_name("media-skip-backward", Gtk.IconSize.LARGE_TOOLBAR)
-        self.prev_button.set_size_request(45, 45)  # Smaller size
+        self.prev_button.set_size_request(45, 45)
         self.prev_button.connect("clicked", self.on_prev)
 
-        # Create combined play/pause button
+        # Play/Pause button
         self.play_pause_button = Gtk.Button.new_from_icon_name("media-playback-start", Gtk.IconSize.LARGE_TOOLBAR)
-        self.play_pause_button.set_size_request(45, 45)  # Smaller size
+        self.play_pause_button.set_size_request(45, 45)
         self.play_pause_button.connect("clicked", self.on_play_pause_clicked)
 
+        # Stop button
         self.stop_button = Gtk.Button.new_from_icon_name("media-playback-stop", Gtk.IconSize.LARGE_TOOLBAR)
-        self.stop_button.set_size_request(45, 45)  # Smaller size
+        self.stop_button.set_size_request(45, 45)
         self.stop_button.connect("clicked", self.on_stop)
 
+        # Next button
         self.next_button = Gtk.Button.new_from_icon_name("media-skip-forward", Gtk.IconSize.LARGE_TOOLBAR)
-        self.next_button.set_size_request(45, 45)  # Smaller size
+        self.next_button.set_size_request(45, 45)
         self.next_button.connect("clicked", self.on_next)
 
-        # Create volume control in a frame
+        # Volume control frame
         volume_frame = Gtk.Frame()
-        volume_frame.set_shadow_type(Gtk.ShadowType.IN)  # Gives button-like appearance
-        volume_frame.set_size_request(-1, 45)
-
-        volume_frame.set_border_width(0)
+        volume_frame.set_shadow_type(Gtk.ShadowType.IN)
+        volume_frame.set_size_request(120, 45)  # Fixed width for volume control
 
         volume_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         volume_box.set_margin_start(4)
@@ -356,23 +359,38 @@ class MusicPlayerWindow(Gtk.Window):
         volume_box.set_margin_top(2)
         volume_box.set_margin_bottom(2)
 
-        # Volume button with icon
+        # Volume button
         self.volume_button = Gtk.Button()
         self.volume_icon = Gtk.Image.new_from_icon_name("audio-volume-high", Gtk.IconSize.SMALL_TOOLBAR)
         self.volume_button.add(self.volume_icon)
         self.volume_button.connect("clicked", self.on_volume_button_clicked)
-        volume_box.pack_start(self.volume_button, False, False, 0)
 
         # Volume slider
         self.volume_scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 1)
-        self.volume_scale.set_size_request(100, -1)
+        self.volume_scale.set_size_request(80, -1)  # Fixed width for slider
         self.volume_scale.set_value(100)
         self.volume_scale.connect('value-changed', self.on_volume_changed)
-        volume_box.pack_start(self.volume_scale, True, True, 0)
 
+        # Pack volume controls
+        volume_box.pack_start(self.volume_button, False, False, 0)
+        volume_box.pack_start(self.volume_scale, True, True, 0)
         volume_frame.add(volume_box)
 
-        # Add buttons to control box
+        # Create right box for clear playlist with fixed width
+        right_box = Gtk.Box(spacing=6)
+        right_box.set_margin_end(10)
+        right_box.set_size_request(100, -1)  # Fixed width
+
+        # Clear playlist button
+        clear_playlist_button = Gtk.Button()
+        trash_icon = Gtk.Image.new_from_icon_name("user-trash", Gtk.IconSize.SMALL_TOOLBAR)
+        clear_playlist_button.add(trash_icon)
+        clear_playlist_button.set_tooltip_text("Clear Playlist")
+        clear_playlist_button.connect("clicked", self.on_clear_playlist_clicked)
+        clear_playlist_button.set_size_request(25, 25)
+        right_box.pack_end(clear_playlist_button, False, False, 0)
+
+        # Pack all control buttons in the center box
         control_box.pack_start(self.shuffle_button, False, False, 0)
         control_box.pack_start(self.repeat_button, False, False, 0)
         control_box.pack_start(self.prev_button, False, False, 0)
@@ -381,8 +399,12 @@ class MusicPlayerWindow(Gtk.Window):
         control_box.pack_start(self.next_button, False, False, 0)
         control_box.pack_start(volume_frame, False, False, 0)
 
+        # Pack everything into the outer box with proper spacing
         outer_box.pack_start(playlist_box, False, False, 0)
-        outer_box.pack_start(control_box, True, True, 0)
+        outer_box.pack_start(Gtk.Box(), True, True, 0)  # Flexible spacing
+        outer_box.pack_start(control_box, False, False, 0)
+        outer_box.pack_start(Gtk.Box(), True, True, 0)  # Flexible spacing
+        outer_box.pack_end(right_box, False, False, 0)
 
         self.player_view.pack_start(outer_box, False, False, 0)
 
@@ -987,7 +1009,40 @@ class MusicPlayerWindow(Gtk.Window):
             print(f"Error loading playlist: {e}")
             return False
 
+    def on_clear_playlist_clicked(self, button):
+        # Create confirmation dialog
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            message_type=Gtk.MessageType.QUESTION,
+            buttons=Gtk.ButtonsType.YES_NO,
+            text="Clear Playlist",
+            secondary_text="Are you sure you want to empty the playlist?"
+        )
 
+        response = dialog.run()
+        dialog.destroy()
+
+        if response == Gtk.ResponseType.YES:
+            # Stop playback if playing
+            self.player.set_state(Gst.State.NULL)
+            # Reset current track index
+            self.current_track_index = -1
+            # Clear the playlist store
+            self.playlist_store.clear()
+            # Reset now playing labels
+            self.update_now_playing_label("No track playing")
+            # Reset progress bar and time labels
+            self.progress_bar.set_value(0)
+            self.current_time_label.set_text("0:00")
+            self.duration_label.set_text("0:00")
+            # Reset album art to default
+            default_pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 200, 200)
+            default_pixbuf.fill(0x7F7F7F7F)
+            self.album_art.set_from_pixbuf(default_pixbuf)
+            # Update play/pause button icon
+            self.update_play_pause_button_icon(False)
+            # Update view to show welcome screen
+            self.update_view()
 
     def on_message(self, bus, message):
         t = message.type
