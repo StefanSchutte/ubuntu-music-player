@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Ubuntu Music Player
+Comment=A GTK music player for Ubuntu
+Exec=bash -c "nohup /usr/local/bin/ubuntu-music-player >/dev/null 2>&1 &"
+Icon=ubuntu-music-player
+Type=Application
+Categories=AudioVideo;Audio;Player;GTK;
+Terminal=false
+StartupNotify=true
+StartupWMClass=ubuntu-music-player

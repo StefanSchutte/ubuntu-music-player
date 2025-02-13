@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 import os
 import gi
@@ -11,7 +12,12 @@ import time
 
 class MusicPlayerWindow(Gtk.Window):
     def __init__(self):
-        super().__init__(title="Ubuntu Music Player")
+        Gtk.Window.__init__(self, title="Ubuntu Music Player")
+
+        # Set the application ID to match the desktop file
+        self.set_wmclass("ubuntu-music-player", "Ubuntu Music Player")
+        self.set_icon_name("ubuntu-music-player")
+        # super().__init__(title="Ubuntu Music Player")
 
         # Initialize GStreamer
         Gst.init(None)
